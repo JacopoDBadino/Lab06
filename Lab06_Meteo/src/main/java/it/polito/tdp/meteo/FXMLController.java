@@ -6,6 +6,9 @@ package it.polito.tdp.meteo;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.meteo.model.Model;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,41 +17,55 @@ import javafx.scene.control.TextArea;
 
 public class FXMLController {
 
-    @FXML // ResourceBundle that was given to the FXMLLoader
-    private ResourceBundle resources;
+	Model model;
 
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
-    private URL location;
+	@FXML // ResourceBundle that was given to the FXMLLoader
+	private ResourceBundle resources;
 
-    @FXML // fx:id="boxMese"
-    private ChoiceBox<?> boxMese; // Value injected by FXMLLoader
+	@FXML // URL location of the FXML file that was given to the FXMLLoader
+	private URL location;
 
-    @FXML // fx:id="btnUmidita"
-    private Button btnUmidita; // Value injected by FXMLLoader
+	@FXML // fx:id="boxMese"
+	private ChoiceBox<Integer> boxMese; // Value injected by FXMLLoader
 
-    @FXML // fx:id="btnCalcola"
-    private Button btnCalcola; // Value injected by FXMLLoader
+	@FXML // fx:id="btnUmidita"
+	private Button btnUmidita; // Value injected by FXMLLoader
 
-    @FXML // fx:id="txtResult"
-    private TextArea txtResult; // Value injected by FXMLLoader
+	@FXML // fx:id="btnCalcola"
+	private Button btnCalcola; // Value injected by FXMLLoader
 
-    @FXML
-    void doCalcolaSequenza(ActionEvent event) {
+	@FXML // fx:id="txtResult"
+	private TextArea txtResult; // Value injected by FXMLLoader
 
-    }
+	@FXML
+	void doCalcolaSequenza(ActionEvent event) {
+		txtResult.clear();
+		if (boxMese.getValue() != null)
+			txtResult.appendText(model.trovaSequenza((boxMese.getValue())));
+		else
+			txtResult.appendText("Selezionare un mese!");
+	}
 
-    @FXML
-    void doCalcolaUmidita(ActionEvent event) {
+	@FXML
+	void doCalcolaUmidita(ActionEvent event) {
+		txtResult.clear();
+		if (boxMese.getValue() != null)
+			txtResult.appendText(model.getUmiditaMedia(model.intToString(boxMese.getValue())));
+		else
+			txtResult.appendText("Selezionare un mese!");
+	}
 
-    }
+	@FXML // This method is called by the FXMLLoader when initialization is complete
+	void initialize() {
+		assert boxMese != null : "fx:id=\"boxMese\" was not injected: check your FXML file 'Scene.fxml'.";
+		assert btnUmidita != null : "fx:id=\"btnUmidita\" was not injected: check your FXML file 'Scene.fxml'.";
+		assert btnCalcola != null : "fx:id=\"btnCalcola\" was not injected: check your FXML file 'Scene.fxml'.";
+		assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-        assert boxMese != null : "fx:id=\"boxMese\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert btnUmidita != null : "fx:id=\"btnUmidita\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert btnCalcola != null : "fx:id=\"btnCalcola\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
+	}
 
-    }
+	public void setModel(Model model) {
+		this.model = model;
+		boxMese.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	}
 }
-
