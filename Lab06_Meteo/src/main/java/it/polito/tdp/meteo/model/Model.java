@@ -1,7 +1,9 @@
 package it.polito.tdp.meteo.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import it.polito.tdp.meteo.DAO.MeteoDAO;
 
@@ -47,7 +49,7 @@ public class Model {
 		dati.add(new Citta("Torino", dao.getAllRilevamentiLocalitaMese(intToString(mese), "Torino")));
 		dati.add(new Citta("Milano", dao.getAllRilevamentiLocalitaMese(intToString(mese), "Milano")));
 
-		ricorsiva(0, 0, parziale);
+		ricorsiva(0, parziale);
 
 		for (Rilevamento r : soluzione)
 			if (esito.equals(""))
@@ -55,41 +57,25 @@ public class Model {
 			else
 				esito += "\n" + r;
 
+		esito += "\nCosto totale: " + costoBst;
+
 		return esito;
 	}
 
-	public void ricorsiva(int livello, int cons, List<Rilevamento> parziale) {
+	public void ricorsiva(int livello, List<Rilevamento> parziale) {
 
 		if (costoBst != -1 && calcolaCosto(parziale) > costoBst)
 			return;
 
 		if (livello == 15) {
 			if (costoBst == -1 || calcolaCosto(parziale) < costoBst)
-				soluzione = new ArrayList<Rilevamento>(parziale);
+				if (controllaSoluzione(parziale) == true) {
+					soluzione = new ArrayList<Rilevamento>(parziale);
+					System.out.println("Soluzione Aggiornata");
+					System.out.println(parziale);
+					System.out.println(calcolaCosto(parziale) + "\n\n");
+				}
 			costoBst = calcolaCosto(parziale);
-			return;
-		}
-
-		if (parziale.size() != 0 && cons < 3) {
-
-			Citta c = getCittaPerNome(dati, parziale.get(parziale.size() - 1).getLocalita());
-
-			if (c.getCounter() < 6) {
-
-				Rilevamento r = c.getRilevamenti().get(livello);
-				parziale.add(r);
-				c.increaseCounter();
-
-				if (parziale.size() > 1
-						&& r.getLocalita().equals(parziale.get(parziale.size() - 2).getLocalita()) == false)
-					ricorsiva(livello + 1, 1, parziale);
-				else
-					ricorsiva(livello + 1, cons + 1, parziale);
-
-				c.setCounter(c.getCounter() - 1);
-				parziale.remove(r);
-			}
-
 			return;
 		}
 
@@ -98,16 +84,14 @@ public class Model {
 			if (c.getCounter() < 6) {
 
 				Rilevamento r = c.getRilevamenti().get(livello);
+
 				parziale.add(r);
 				c.increaseCounter();
 
-				if (parziale.size() > 1 && r.getLocalita() != parziale.get(parziale.size() - 2).getLocalita())
-					ricorsiva(livello + 1, 1, parziale);
-				else
-					ricorsiva(livello + 1, cons + 1, parziale);
+				ricorsiva(livello + 1, parziale);
 
 				c.setCounter(c.getCounter() - 1);
-				parziale.remove(r);
+				parziale.remove(parziale.size() - 1);
 			}
 
 		}
@@ -133,6 +117,35 @@ public class Model {
 			if (c.getNome().equals(nome))
 				return c;
 		return null;
+	}
+
+	public boolean controllaSoluzione(List<Rilevamento> parz) {
+		Set<String> citta = new HashSet<String>();
+		int cont = 0;
+
+		for (int i = 0; i < parz.size(); i++) {
+
+			if (citta.contains(parz.get(i).getLocalita()) == false)
+				citta.add(parz.get(i).getLocalita());
+
+			if (i != 0) {
+				if (parz.get(i).getLocalita().equals(parz.get(i - 1).getLocalita())) {
+					cont++;
+				} else {
+					if (cont < 2)
+						return false;
+					else
+						cont = 0;
+				}
+
+			}
+
+		}
+
+		if (citta.size() != 3)
+			return false;
+
+		return true;
 	}
 
 }

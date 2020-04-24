@@ -7,7 +7,7 @@ public class TestMeteoDAO {
 	public static void main(String[] args) {
 
 		MeteoDAO dao = new MeteoDAO();
-		for (Rilevamento r : dao.getAllRilevamentiLocalitaMese("11", "Genova"))
+		for (Rilevamento r : dao.getAllRilevamentiMese("01"))
 			System.out.println(r.getData());
 		
 		
